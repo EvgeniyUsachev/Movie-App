@@ -1,0 +1,104 @@
+#root {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  background-color: #e5e5e5;
+}
+
+.card {
+  width: 454px;
+  height: 281px;
+  // border: solid 1px black;
+  display: flex;
+  margin-right: 18px;
+  margin-left: 18px;
+  -webkit-box-shadow: 5px 6px 16px -1px rgba(0, 0, 0, 0.64);
+  box-shadow: 5px 6px 16px -1px rgba(0, 0, 0, 0.64);
+  margin-bottom: 35px;
+  &__img {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 183px;
+    .img {
+      height: 281px;
+      width: 183px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+  &__content {
+    padding: 12px 10px 49px 20px;
+    width: 241px;
+    h1 {
+      margin-bottom: 7px;
+      margin-top: 0px;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 28px;
+    }
+  }
+  &__date {
+    font-size: 12px;
+    line-height: 22px;
+    color: #827e7e;
+    margin-bottom: 9px;
+  }
+  &__genre {
+    margin-bottom: 7px;
+    display: flex;
+    flex-wrap: wrap;
+    &__item {
+      margin-bottom: 5px;
+      padding: 0 5px;
+      height: 20px;
+      font-size: 12px;
+      background: #fafafa;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      color: rgba(0, 0, 0, 0.65);
+      margin-right: 8px;
+      text-align: center;
+      line-height: 20px;
+    }
+  }
+  &__description {
+    font-size: 12px;
+    line-height: 22px;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  &__rating {
+    height: 46px;
+    width: 280px;
+    margin-left: -5px;
+  }
+  &__wrapper {
+    display: block;
+    height: 223px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.wrapper {
+  padding-top: 20px;
+  display: flex;
+  width: 1010px;
+  margin: 0 auto;
+  background-color: white;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ant-rate-star-zero {
+  margin-right: 1px;
+  margin-inline-end: 5px;
+}
