@@ -20,42 +20,45 @@ const App: React.FC = () => {
   const [error, setError] = useState(false);
   const [searchRequest, setSearchRequest] = useState('');
   const [genres, setGenres] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1000);
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState('');
   const [ratedFilms, setRatedFilms] = useState([]);
+  const [totalRated, setTotalRated] = useState(0);
+  const [ratedPage, setRatedPage] = useState(1);
+
+  const localPage = Number(localStorage.getItem('page')!) ? Number(localStorage.getItem('page')!) : 1;
+  const localSearch = localStorage.getItem('query')!;
+  const localSessionId = localStorage.getItem('sessionID')!;
 
   const api = new ApiService();
   useEffect(() => {
     const api = new ApiService();
     api.getGenre().then((info) => {
-      console.log('genres', info);
       setGenres(info);
     });
 
     api
-      .getData(searchRequest, page)
+      .getData(localSearch, localPage)
       .then((filmsData) => {
         console.log(filmsData);
-        if (searchRequest.length === 0) {
-          api.getPopular().then((popularData) => {
+        if (localSearch === null || localSearch === '') {
+          api.getPopular(localPage).then((popularData) => {
             setFilmsData(popularData);
-            console.log('popular', popularData);
             setTotal(popularData[0].totalFilms);
             setLoading(false);
           });
         } else {
           setFilmsData(filmsData);
+
           setLoading(false);
           setTotal(filmsData[0].totalFilms);
+          setLoading(false);
         }
       })
       .catch((err: Error) => {
         setError(true);
         setLoading(false);
-        console.log('error catched');
-        console.log(err);
-        console.log(error);
       });
   }, [searchRequest, page, total, error]);
 
@@ -63,8 +66,16 @@ const App: React.FC = () => {
     const api = new ApiService();
     api.createGuestSession().then((id) => {
       setSessionId(id);
-      localStorage.clear();
+      if (localStorage.getItem('sessionID') === null) {
+        localStorage.setItem('sessionID', id);
+      }
+
+      // localStorage.clear();
+      // localStorage.setItem('page', '1');
     });
+    /*  api.getGenre().then((info) => {
+      setGenres(info);
+    }); */
   }, []);
 
   const loadingSpinner = loading ? <LoadingSpinner /> : null;
@@ -72,25 +83,35 @@ const App: React.FC = () => {
   const errorMessage = error ? <ErrorIndicator /> : null;
 
   const onSearch = debounce((value: string) => {
+    localStorage.setItem('query', value);
+
     setSearchRequest(value);
     setLoading(true);
     setError(false);
-    setPage(1);
+    localStorage.setItem('page', '1');
   }, 500);
 
   const onPagignationChange = (page: number) => {
+    localStorage.setItem('page', page.toString());
     setPage(page);
   };
 
-  const paginationItem =
-    Object.keys(filmsData).length && !loading ? (
-      <Pagination onChange={onPagignationChange} pageSize={20} total={total} />
-    ) : null;
+  const onRatedPagignationChange = (page: number) => {
+    setLoading(true);
+    setRatedPage(page);
+    api.getRatedMovies(localSessionId, page).then((ratedMovies) => {
+      setLoading(false);
+      setFilmsData(ratedMovies);
+      setRatedFilms(ratedMovies);
+      setTotalRated(ratedMovies[0].totalFilms);
+    });
+    setRatedPage(page);
+  };
 
   const handleRatingChange = (value: number, id: number) => {
     // setRating(value);
     api
-      .rateMovie(value, id, sessionId)
+      .rateMovie(value, id, localSessionId)
 
       .catch((err) => {
         console.log('error frompost request', err);
@@ -105,37 +126,34 @@ const App: React.FC = () => {
       obj[id] = value;
       localStorage.setItem('ratedFilms', JSON.stringify(obj));
     }
-
-    console.log(id, value, sessionId);
   };
 
   const getRatedMovies = (activeKey: string) => {
     setLoading(true);
 
     if (activeKey === '2') {
-      api.getRatedMovies(sessionId).then((ratedMovies) => {
-        console.log('from getRatedMovies', ratedMovies);
-        setLoading(false);
-        setFilmsData(ratedMovies);
-        setRatedFilms(ratedMovies);
-
-        console.log(ratedMovies.length);
-      });
+      api
+        .getRatedMovies(localSessionId, ratedPage)
+        .then((ratedMovies) => {
+          setLoading(false);
+          setFilmsData(ratedMovies);
+          setRatedFilms(ratedMovies);
+          setTotalRated(ratedMovies[0].totalFilms);
+        })
+        .catch((err: Error) => console.log(err));
     }
     if (activeKey === '1') {
-      api.getData(searchRequest, page).then((filmsData) => {
-        console.log(filmsData);
+      api.getData(localSearch, localPage).then((filmsData) => {
         if (filmsData.length === 0) {
-          api.getPopular().then((popularData) => {
+          api.getPopular(localPage).then((popularData) => {
             setFilmsData(popularData);
-            console.log('popular', popularData);
             setTotal(popularData[0].totalFilms);
             setLoading(false);
             setError(false);
           });
         } else {
           api
-            .getData(searchRequest, page)
+            .getData(localSearch, localPage)
             .then((filmsData) => {
               setFilmsData(filmsData);
               setLoading(false);
@@ -145,7 +163,6 @@ const App: React.FC = () => {
             .catch((err: Error) => {
               setError(true);
               setLoading(false);
-              console.log('error catched');
               console.log(err);
               console.log(error);
             });
@@ -153,10 +170,14 @@ const App: React.FC = () => {
       });
     }
   };
+  const paginationItem =
+    Object.keys(filmsData).length && !loading ? (
+      <Pagination onChange={onPagignationChange} pageSize={20} total={total} current={localPage} />
+    ) : null;
 
   const ratedPagination =
     Object.keys(filmsData).length && !loading ? (
-      <Pagination onChange={onPagignationChange} pageSize={20} total={filmsData.length} />
+      <Pagination onChange={onRatedPagignationChange} pageSize={20} total={totalRated} current={ratedPage} />
     ) : null;
 
   const tabItems: TabsProps['items'] = [
@@ -168,7 +189,7 @@ const App: React.FC = () => {
         <>
           <div className="App">
             <Online>
-              <SearchPanel onSearch={onSearch} sessionId={sessionId} />
+              <SearchPanel onSearch={onSearch} sessionId={sessionId} searchRequest={searchRequest} />
               {loadingSpinner}
               <FilmList
                 films={filmsData}
@@ -178,7 +199,7 @@ const App: React.FC = () => {
                 handleRatingChange={handleRatingChange}
                 searchRequest={searchRequest}
               />
-              {paginationItem}
+              <div style={{ textAlign: 'center' }}>{paginationItem}</div>
             </Online>
             <OfflineText />
           </div>
@@ -199,10 +220,11 @@ const App: React.FC = () => {
                 loading={loading}
                 errorMessage={errorMessage}
                 handleRatingChange={handleRatingChange}
-                searchRequest={searchRequest}
+                searchRequest={localStorage.getItem('query')!}
               />
               <EmptyIndicator rated={ratedFilms} />
-              {ratedPagination}
+              {/* {ratedPagination} */}
+              <div style={{ textAlign: 'center' }}>{ratedPagination}</div>
             </Online>
 
             <OfflineText />

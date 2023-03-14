@@ -7,7 +7,6 @@ interface Props {
 
 function RoundRating({ votes }: Props) {
   let color = '';
-  console.log(typeof votes);
 
   if (votes <= 3) {
     color = '#E90000';

@@ -24,7 +24,6 @@ interface PropTypes {
 function FilmCard(props: PropTypes) {
   const [ratedValue, setRatedValue] = React.useState(0);
 
-  console.log(props.rating);
   function setDate(date: string) {
     if (date) {
       const format = moment(date).format('MMMM D, YYYY');
@@ -75,14 +74,8 @@ function FilmCard(props: PropTypes) {
     return genresBtn;
   }
 
-  // React.useEffect(() => {
-  //   localStorage.setItem('ratedFilms', '{"1":1}');
-  // }, []);
-
   const getStarRating = (rating: number, id: number) => {
     if (rating) {
-      console.log('есть rating поэтому ставим', rating);
-
       return rating;
     }
 
@@ -93,27 +86,7 @@ function FilmCard(props: PropTypes) {
     } catch {
       return 0;
     }
-
-    // ]
-    // else if (
-    //   JSON.parse(localStorage.getItem('ratedFilms')!)[
-    //     id
-    //   ] !== null
-    // ) {
-    //   console.log(
-    //     'есть localStorage поэтому ставим',
-    //     JSON.parse(localStorage.getItem('ratedFilms')!)[id]
-    //   );
-
-    //   return JSON.parse(
-    //     localStorage.getItem('ratedFilms')!
-    //   )[id];
-    // }
   };
-
-  // React.useEffect(() => {
-  //   getStarRating(props.rating, props.id);
-  // });
 
   return (
     <div className="card">

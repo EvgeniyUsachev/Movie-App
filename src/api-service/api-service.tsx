@@ -26,16 +26,14 @@ export default class ApiService {
       };
       _transformedArr.push(transformedFilm);
     });
-    // console.log(_transformedArr);
     return _transformedArr;
   };
 
-  getPopular = async () => {
+  getPopular = async (page: number) => {
     const response = await axios.get(
-      'https://api.themoviedb.org/3/movie/popular?api_key=7d0349337e7da854b0da94f99185e198&language=en-US&page=1'
+      `https://api.themoviedb.org/3/movie/popular?api_key=7d0349337e7da854b0da94f99185e198&language=en-US&page=${page}`
     );
     console.log('this message comes from popular ');
-    console.log(response.data);
     return this._transformData(response.data);
   };
 
@@ -50,7 +48,6 @@ export default class ApiService {
     const response = await axios.get(
       'https://api.themoviedb.org/3/authentication/guest_session/new?api_key=7d0349337e7da854b0da94f99185e198'
     );
-    console.log('guest', response);
     return response.data.guest_session_id;
   };
 
@@ -67,13 +64,12 @@ export default class ApiService {
       { headers }
     );
 
-    console.log('post response from api', response);
     return response;
   };
 
-  getRatedMovies = async (sessionId: string) => {
+  getRatedMovies = async (sessionId: string, page: number) => {
     const response = await axios.get(
-      `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?api_key=7d0349337e7da854b0da94f99185e198&language=en-US&sort_by=created_at.asc`
+      `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?api_key=7d0349337e7da854b0da94f99185e198&language=en-US&sort_by=created_at.asc&page=${page}`
     );
 
     return this._transformData(response.data);

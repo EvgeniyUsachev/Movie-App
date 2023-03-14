@@ -5,8 +5,8 @@
 }
 
 .card {
-  width: 454px;
-  height: 281px;
+  max-width: 454px;
+  max-height: 281px;
   // border: solid 1px black;
   display: flex;
   margin-right: 18px;
@@ -19,7 +19,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 183px;
+    max-width: 183px;
     .img {
       height: 281px;
       width: 183px;
@@ -76,8 +76,8 @@
   }
   &__rating {
     height: 46px;
-    width: 280px;
-    margin-left: -5px;
+    min-width: 280px;
+    margin-left: -10px;
   }
   &__wrapper {
     display: block;
@@ -91,7 +91,7 @@
 .wrapper {
   padding-top: 20px;
   display: flex;
-  width: 1010px;
+  max-width: 1010px;
   margin: 0 auto;
   background-color: white;
   justify-content: center;
@@ -99,6 +99,21 @@
 }
 
 .ant-rate-star-zero {
-  margin-right: 1px;
-  margin-inline-end: 5px;
+  margin-right: 0px;
+  margin-inline-end: 1px;
+}
+
+@media (max-width: 500px) {
+  .card {
+    margin-right: 0;
+    &__img {
+      max-width: 150px;
+      .img {
+        max-width: 150px;
+      }
+    }
+    /*  &__content {
+      width: 220px;
+    } */
+  }
 }
